@@ -95,14 +95,14 @@ struct ContentView: View {
         }
     }
 
-//    /// Builds a `CloudSharingView` with state after processing a share.
-//    private func shareView() -> CloudSharingView? {
-//        guard let share = activeShare, let container = activeContainer else {
-//            return nil
-//        }
-//
-//        return CloudSharingView(container: container, share: share)
-//    }
+    /// Builds a `CloudSharingView` with state after processing a share.
+    private func shareView() -> CloudSharingView? {
+        guard let share = activeShare, let container = activeContainer else {
+            return nil
+        }
+
+        return CloudSharingView(container: container, share: share)
+    }
 
     /// Builds a Contact row view for display contact information in a List.
     private func contactRowView(for post: Post) -> some View {
