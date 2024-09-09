@@ -9,27 +9,33 @@ import SwiftUI
 import CloudKit
 
 struct ContentView: View {
-    @EnvironmentObject private var vm: ViewModelTwo
-    @State private var isAddingPost = false
+
+    // MARK: - Properties & State
+
+    @EnvironmentObject private var vm: ViewModel
+
+    @State private var isAddingContact = false
     @State private var isSharing = false
     @State private var isProcessingShare = false
-    
-    @State private var activeShare = false
+
+    @State private var activeShare: CKShare?
     @State private var activeContainer: CKContainer?
-    
+
+    // MARK: - Views
+
     var body: some View {
         NavigationView {
             contentView
-                .navigationTitle("Posts")
+                .navigationTitle("Contacts")
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button { Task { try await vm.refresh() } } label: { Image(systemName: "arrow.clockwise") }
                     }
                     ToolbarItem(placement: .navigationBarLeading) {
-                        //
+                        progressView
                     }
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button { Task { isAddingPost = true } } label: { Image(systemName: "plus") }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: { isAddingContact = true }) { Image(systemName: "plus") }
                     }
                 }
         }
@@ -39,24 +45,41 @@ struct ContentView: View {
                 try await vm.refresh()
             }
         }
-        .sheet(isPresented: $isAddingPost, content: {
-            // Contact View
-        })
-        .sheet(isPresented: $isSharing, content: {
-            //shareview
+        .sheet(isPresented: $isAddingContact, content: {
+           // AddContactView(onAdd: addContact, onCancel: { isAddingContact = false })
         })
     }
-    
+
+    /// This progress view will display when either the ViewModel is loading, or a share is processing.
+    var progressView: some View {
+        let showProgress: Bool = {
+            if case .loading = vm.state {
+                return true
+            } else if isProcessingShare {
+                return true
+            }
+
+            return false
+        }()
+
+        return Group {
+            if showProgress {
+                ProgressView()
+            }
+        }
+    }
+
+    /// Dynamic view built from ViewModel state.
     private var contentView: some View {
         Group {
             switch vm.state {
             case let .loaded(privateContacts, sharedContacts):
                 List {
-                    Section(header: Text("Private")) {
-                        ForEach(privateContacts) { postRowView(for: $0) }
+                    Section(header: Text("My Contacts")) {
+                        ForEach(privateContacts) { contactRowView(for: $0) }
                     }
                     Section(header: Text("Shared")) {
-                        ForEach(sharedContacts) { postRowView(for: $0, shareable: false) }
+                        ForEach(sharedContacts) { contactRowView(for: $0) }
                     }
                 }.listStyle(GroupedListStyle())
 
@@ -71,50 +94,60 @@ struct ContentView: View {
             }
         }
     }
-    
+
+//    /// Builds a `CloudSharingView` with state after processing a share.
+//    private func shareView() -> CloudSharingView? {
+//        guard let share = activeShare, let container = activeContainer else {
+//            return nil
+//        }
+//
+//        return CloudSharingView(container: container, share: share)
+//    }
+
     /// Builds a Contact row view for display contact information in a List.
-     private func postRowView(for contact: Post, shareable: Bool = true) -> some View {
-         HStack {
-             VStack(alignment: .leading) {
-                 Text(contact.message)
-             }
-             if shareable {
-                 Spacer()
-                 Button(action: { Task { try? await shareContact(contact) } }, label: { Image(systemName: "square.and.arrow.up") }).buttonStyle(BorderlessButtonStyle())
-                     .sheet(isPresented: $isSharing, content: { shareView() })
-             }
-         }
-     }
-    
+    private func contactRowView(for post: Post) -> some View {
+        HStack {
+            VStack(alignment: .leading) {
+                Text(post.message)
+            }
+        }
+    }
+
     // MARK: - Actions
 
-      private func addContact(name: String, phoneNumber: String) async throws {
-          try await vm.addContact(name: name, phoneNumber: phoneNumber)
-          try await vm.refresh()
-          isAddingContact = false
-      }
+    private func addContact(message: String) async throws {
+        try await vm.addPost(message: message)
+        try await vm.refresh()
+        isAddingContact = false
+    }
 
-      private func shareContact(_ contact: Contact) async throws {
-          isProcessingShare = true
+    private func shareContact(_ post: Post) async throws {
+        isProcessingShare = true
 
-          do {
-              let (share, container) = try await vm.fetchOrCreateShare(contact: contact)
-              isProcessingShare = false
-              activeShare = share
-              activeContainer = container
-              isSharing = true
-          } catch {
-              debugPrint("Error sharing contact record: \(error)")
-          }
-      }
+        do {
+            let (share, container) = try await vm.fetchOrCreateShare()
+            isProcessingShare = false
+            activeShare = share
+            activeContainer = container
+            isSharing = true
+        } catch {
+            debugPrint("Error sharing contact record: \(error)")
+        }
+    }
 }
 
-struct ContentView_Preview: PreviewProvider {
-    private static let previewPost: [Post] = [
-        Post(id: UUID().uuidString, message: "Hello there", associatedRecord: CKRecord(recordType: "SharePost"))
+struct ContentView_Previews: PreviewProvider {
+    private static let previewContacts: [Post] = [
+        Post(
+            id: UUID().uuidString,
+            message: "John Appleseed",
+            author: "Me",
+            associatedRecord: CKRecord(recordType: "SharedContact")
+        )
     ]
-    
+
     static var previews: some View {
         ContentView()
+           // .environmentObject(ViewModel(state: .loaded(private: previewContacts, shared: previewContacts)))
     }
 }

@@ -7,147 +7,188 @@
 
 import Foundation
 import CloudKit
+import OSLog
 
 @MainActor
 final class ViewModel: ObservableObject {
     
-    //MARK: - Error
+    // MARK: - Error
     
     enum ViewModelError: Error {
         case invalidRemoteShare
+        case userZoneNotFound
     }
     
-    //MARK: - State
+    // MARK: - State
     
     enum State {
         case loading
-        case loaded(privateUsers: [User], shareUsers: [User])
+        case loaded(privatePosts: [Post], sharedPosts: [Post])
         case error(Error)
     }
     
-    //MARK: - Properties
+    // MARK: - Properties
     
-    /// State directly observed by view
+    @Published private(set) var currentUserName: String = "Me"
+    /// State directly observable by our view.
     @Published private(set) var state: State = .loading
-    /// Uses iCloud container ID
+    /// Use the specified iCloud container ID, which should also be present in the entitlements file.
     lazy var container = CKContainer(identifier: Config.containerIndetifier)
-    ///Project uses user private data base
+    /// This project uses the user's private database.
     private lazy var database = container.privateCloudDatabase
+    /// Sharing requires using a custom record zone.
+    private var userZone: CKRecordZone?
     
-    let defaultZoneName = "DefaultPostZone"
-    //MARK: - init
+    // MARK: - Init
     
     nonisolated init() {}
     
-    /// For previews
+    /// Initializer to provide explicit state (e.g. for previews).
     init(state: State) {
         self.state = state
     }
     
-    //MARK: - API Calls
+    // MARK: - API
     
-    /// Updates posts from the remote database and updates local state
+    /// Fetches contacts from the remote databases and updates local state.
     func refresh() async throws {
         state = .loading
         do {
+            try await ensureUserZoneExists()
             let (privatePosts, sharedPosts) = try await fetchPrivateAndSharedPosts()
-            state = .loaded(privateUsers: privatePosts, shareUsers: sharedPosts)
+            state = .loaded(privatePosts: privatePosts, sharedPosts: sharedPosts)
         } catch {
             state = .error(error)
         }
     }
     
-    /// Fetches both private and shared posts
-    /// - Returns: A tuple containing seperated private and shared posts
-    func fetchPrivateAndSharedPosts() async throws -> (private: [User], shared: [User]) {
-        // Determine zones for each set of posts
-        // In the private DB, we want to ignore the default zone.
-        let privateZones = try await database.allRecordZones().filter({ $0.zoneID != CKRecordZone.default().zoneID })
-        let sharedZones = try await container.sharedCloudDatabase.allRecordZones()
+    /// Fetches both private and shared contacts in parallel.
+    /// - Returns: A tuple containing separated private and shared contacts.
+    func fetchPrivateAndSharedPosts() async throws -> (private: [Post], shared: [Post]) {
+        guard let userZone = userZone else {
+            throw ViewModelError.userZoneNotFound
+        }
         
-        // Runs operations in parallel
-        async let privatePosts = fetchPosts(scope: .private, in: privateZones)
-        async let sharedPosts = fetchPosts(scope: .shared, in: sharedZones)
+        // This will run each of these operations in parallel.
+        async let privatePosts = fetchPosts(scope: .private, in: [userZone])
+        async let sharedPosts = fetchSharedPosts()
         
         return (private: try await privatePosts, shared: try await sharedPosts)
-        
     }
     
-    func addContact(message: String) async throws {
+    /// Adds a new Contact to the database.
+    /// - Parameters:
+    ///   - name: Name of the Contact.
+    ///   - phoneNumber: Phone number of the contact.
+    ///   - author: iCloud user name
+    func addPost(message: String) async throws {
+        guard let userZone = userZone else {
+            throw ViewModelError.userZoneNotFound
+        }
+        
         do {
-            // Ensure zone exists first
-            let zone = CKRecordZone(zoneName: defaultZoneName)
-            try await database.save(zone)
-            
-            let id = CKRecord.ID(zoneID: zone.zoneID)
+            let id = CKRecord.ID(zoneID: userZone.zoneID)
             let postRecord = CKRecord(recordType: "SharedPost", recordID: id)
             postRecord["message"] = message
+            postRecord["author"] = currentUserName
             
             try await database.save(postRecord)
             
         } catch {
-            debugPrint("Error: Failed to save new post: \(error)")
-            throw error 
+            debugPrint("ERROR: Failed to save new Contact: \(error)")
+            throw error
         }
     }
     
-    func fetchOrCreateShare(post: User) async throws -> (CKShare, CKContainer) {
-        guard let existingShare = post.zone.share else {
-            let share = CKShare(recordZoneID: post.zone.zoneID)
-            share[CKShare.SystemFieldKey.title] = "User: \(post.name)"
+    /// Fetches an existing `CKShare` on a Contact record, or creates a new one in preparation to share a Contact with another user.
+    /// - Parameters:
+    ///   - contact: Contact to share.
+    ///   - completionHandler: Handler to process a `success` or `failure` result.
+    func fetchOrCreateShare() async throws -> (CKShare, CKContainer) {
+        guard let userZone = userZone else {
+            throw ViewModelError.userZoneNotFound
+        }
+        
+        if let existingShare = userZone.share {
+            guard let share = try await database.record(for: existingShare.recordID) as? CKShare else {
+                throw ViewModelError.userZoneNotFound
+            }
+            
+            return (share, container)
+        } else {
+            let share =  CKShare(recordZoneID: userZone.zoneID)
+            share[CKShare.SystemFieldKey.title] = "My Posts"
             _ = try await database.modifyRecords(saving: [share], deleting: [])
             return (share, container)
         }
-        
-        guard let share = try await database.record(for: existingShare.recordID) as? CKShare else {
-            throw ViewModelError.invalidRemoteShare
-        }
-        
-        return (share, container)
     }
     
-    //MARK: -  Private
+    private func fetchSharedPosts() async throws -> [Post] {
+        let shareZones = try await container.sharedCloudDatabase.allRecordZones()
+        return try await fetchPosts(scope: .shared, in: shareZones)
+    }
     
-    func fetchPosts(scope: CKDatabase.Scope, in zones: [CKRecordZone]) async throws -> [User] {
+    private func ensureUserZoneExists() async throws {
+        let userId = try await container.userRecordID()
+        let zoneName = "user-\(userId.recordName)"
+        let zone = CKRecordZone(zoneName: zoneName)
+        
+        do {
+            try await database.save(zone)
+            userZone = zone
+        } catch  {
+            if let ckError = error as? CKError, ckError.code == .zoneNotFound {
+                userZone = try await database.recordZone(for: zone.zoneID)
+            } else {
+                throw error
+            }
+        }
+    }
+    
+    //MARK: - Author/Username
+    
+    private func fetchUserName() async {
+        do {
+            let userIdentity = try await container.userIdentity(forUserRecordID: try await container.userRecordID())
+            if let name = userIdentity?.nameComponents?.givenName ?? userIdentity?.nameComponents?.familyName {
+                currentUserName = name
+            } else if let email = userIdentity?.lookupInfo?.emailAddress {
+                currentUserName = email
+            }
+        } catch {
+            print("Error fetching user identity: \(error)")
+        }
+    }
+    
+    // MARK: - Private
+    
+    /// Fetches contacts for a given set of zones in a given database scope.
+    /// - Parameters:
+    ///   - scope: Database scope to fetch from.
+    ///   - zones: Record zones to fetch contacts from.
+    /// - Returns: Combined set of contacts across all given zones.
+    private func fetchPosts(scope: CKDatabase.Scope, in zones: [CKRecordZone]) async throws -> [Post] {
         guard !zones.isEmpty else { return [] }
         
         let database = container.database(with: scope)
-        var allPosts: [User] = []
+        var allPosts: [Post] = []
         
-        @Sendable func postInZone(_ zone: CKRecordZone) async throws -> [Post] {
-            if zone.zoneID == CKRecordZone.default().zoneID {
-                return []
-            }
-            
-            var allPosts: [Post] = []
-            
+        for zone in zones {
+            /// `recordZoneChanges` can return multiple consecutive changesets before completing, so
+            /// we use a loop to process multiple results if needed, indicated by the `moreComing` flag.
             var awaitingChanges = true
+            /// After each loop, if more changes are coming, they are retrieved by using the `changeToken` property.
             var nextChangeToken: CKServerChangeToken? = nil
             
             while awaitingChanges {
                 let zoneChanges = try await database.recordZoneChanges(inZoneWith: zone.zoneID, since: nextChangeToken)
                 let posts = zoneChanges.modificationResultsByID.values
-                    .compactMap({ try? $0.get().record })
-                    .compactMap({ Post(record: $0)})
+                    .compactMap { try? $0.get().record }
+                    .compactMap { Post(record: $0) }
                 allPosts.append(contentsOf: posts)
                 
                 awaitingChanges = zoneChanges.moreComing
                 nextChangeToken = zoneChanges.changeToken
-            }
-            
-            return allPosts
-        }
-        
-        // Fetch each zones posts in parallel
-        try await withThrowingTaskGroup(of: (CKRecordZone, [Post]).self) { user in
-            for zone in zones {
-                user.addTask {
-                    (zone, try await postInZone(zone))
-                }
-            }
-            
-            for try await (zone, postsResult) in user {
-                allPosts.append(User(zone: zone, post: postsResult))
             }
         }
         
