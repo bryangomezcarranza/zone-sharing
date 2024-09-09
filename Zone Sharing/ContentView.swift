@@ -46,7 +46,7 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $isAddingContact, content: {
-           // AddContactView(onAdd: addContact, onCancel: { isAddingContact = false })
+           AddPostView(onAdd: addContact, onCancel: { isAddingContact = false })
         })
     }
 

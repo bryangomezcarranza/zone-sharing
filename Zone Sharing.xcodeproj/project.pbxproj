@@ -14,6 +14,8 @@
 		88CC72932C8B7D8D00D82A0A /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CC72922C8B7D8D00D82A0A /* Post.swift */; };
 		88CC72992C8B80B300D82A0A /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CC72982C8B80B300D82A0A /* ViewModel.swift */; };
 		88CC729B2C8B818E00D82A0A /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CC729A2C8B818E00D82A0A /* Config.swift */; };
+		88CC72A02C8F971E00D82A0A /* CloudSharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CC729F2C8F971E00D82A0A /* CloudSharingView.swift */; };
+		88CC72A22C8F988A00D82A0A /* AddPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CC72A12C8F988A00D82A0A /* AddPostView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,8 @@
 		88CC72922C8B7D8D00D82A0A /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		88CC72982C8B80B300D82A0A /* ViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		88CC729A2C8B818E00D82A0A /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		88CC729F2C8F971E00D82A0A /* CloudSharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSharingView.swift; sourceTree = "<group>"; };
+		88CC72A12C8F988A00D82A0A /* AddPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPostView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +62,7 @@
 		88CC72822C8B794800D82A0A /* Zone Sharing */ = {
 			isa = PBXGroup;
 			children = (
+				88CC729E2C8F970A00D82A0A /* Views */,
 				88CC72972C8B809200D82A0A /* ViewModels */,
 				88CC72962C8B805800D82A0A /* Models */,
 				88CC72912C8B7C8100D82A0A /* Zone Sharing.entitlements */,
@@ -92,6 +97,15 @@
 				88CC72982C8B80B300D82A0A /* ViewModel.swift */,
 			);
 			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		88CC729E2C8F970A00D82A0A /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				88CC729F2C8F971E00D82A0A /* CloudSharingView.swift */,
+				88CC72A12C8F988A00D82A0A /* AddPostView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -167,6 +181,8 @@
 				88CC72992C8B80B300D82A0A /* ViewModel.swift in Sources */,
 				88CC72932C8B7D8D00D82A0A /* Post.swift in Sources */,
 				88CC72862C8B794800D82A0A /* ContentView.swift in Sources */,
+				88CC72A22C8F988A00D82A0A /* AddPostView.swift in Sources */,
+				88CC72A02C8F971E00D82A0A /* CloudSharingView.swift in Sources */,
 				88CC72842C8B794800D82A0A /* Zone_SharingApp.swift in Sources */,
 				88CC729B2C8B818E00D82A0A /* Config.swift in Sources */,
 			);
