@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		88CC72842C8B794800D82A0A /* Zone_SharingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CC72832C8B794800D82A0A /* Zone_SharingApp.swift */; };
+		88CC72842C8B794800D82A0A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CC72832C8B794800D82A0A /* AppDelegate.swift */; };
 		88CC72862C8B794800D82A0A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CC72852C8B794800D82A0A /* ContentView.swift */; };
 		88CC72882C8B794A00D82A0A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88CC72872C8B794A00D82A0A /* Assets.xcassets */; };
 		88CC728B2C8B794A00D82A0A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88CC728A2C8B794A00D82A0A /* Preview Assets.xcassets */; };
@@ -16,11 +16,12 @@
 		88CC729B2C8B818E00D82A0A /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CC729A2C8B818E00D82A0A /* Config.swift */; };
 		88CC72A02C8F971E00D82A0A /* CloudSharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CC729F2C8F971E00D82A0A /* CloudSharingView.swift */; };
 		88CC72A22C8F988A00D82A0A /* AddPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CC72A12C8F988A00D82A0A /* AddPostView.swift */; };
+		88CC72A52C8FBE0400D82A0A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88CC72A42C8FBE0400D82A0A /* SceneDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		88CC72802C8B794800D82A0A /* Zone Sharing.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Zone Sharing.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		88CC72832C8B794800D82A0A /* Zone_SharingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zone_SharingApp.swift; sourceTree = "<group>"; };
+		88CC72832C8B794800D82A0A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		88CC72852C8B794800D82A0A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		88CC72872C8B794A00D82A0A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		88CC728A2C8B794A00D82A0A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -30,6 +31,7 @@
 		88CC729A2C8B818E00D82A0A /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		88CC729F2C8F971E00D82A0A /* CloudSharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSharingView.swift; sourceTree = "<group>"; };
 		88CC72A12C8F988A00D82A0A /* AddPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPostView.swift; sourceTree = "<group>"; };
+		88CC72A42C8FBE0400D82A0A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,10 +67,7 @@
 				88CC729E2C8F970A00D82A0A /* Views */,
 				88CC72972C8B809200D82A0A /* ViewModels */,
 				88CC72962C8B805800D82A0A /* Models */,
-				88CC72912C8B7C8100D82A0A /* Zone Sharing.entitlements */,
-				88CC72832C8B794800D82A0A /* Zone_SharingApp.swift */,
-				88CC72852C8B794800D82A0A /* ContentView.swift */,
-				88CC72872C8B794A00D82A0A /* Assets.xcassets */,
+				88CC72A32C8FBD2500D82A0A /* App */,
 				88CC72892C8B794A00D82A0A /* Preview Content */,
 				88CC729A2C8B818E00D82A0A /* Config.swift */,
 			);
@@ -102,10 +101,22 @@
 		88CC729E2C8F970A00D82A0A /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				88CC72852C8B794800D82A0A /* ContentView.swift */,
 				88CC729F2C8F971E00D82A0A /* CloudSharingView.swift */,
 				88CC72A12C8F988A00D82A0A /* AddPostView.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		88CC72A32C8FBD2500D82A0A /* App */ = {
+			isa = PBXGroup;
+			children = (
+				88CC72912C8B7C8100D82A0A /* Zone Sharing.entitlements */,
+				88CC72872C8B794A00D82A0A /* Assets.xcassets */,
+				88CC72832C8B794800D82A0A /* AppDelegate.swift */,
+				88CC72A42C8FBE0400D82A0A /* SceneDelegate.swift */,
+			);
+			path = App;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -183,8 +194,9 @@
 				88CC72862C8B794800D82A0A /* ContentView.swift in Sources */,
 				88CC72A22C8F988A00D82A0A /* AddPostView.swift in Sources */,
 				88CC72A02C8F971E00D82A0A /* CloudSharingView.swift in Sources */,
-				88CC72842C8B794800D82A0A /* Zone_SharingApp.swift in Sources */,
+				88CC72842C8B794800D82A0A /* AppDelegate.swift in Sources */,
 				88CC729B2C8B818E00D82A0A /* Config.swift in Sources */,
+				88CC72A52C8FBE0400D82A0A /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
