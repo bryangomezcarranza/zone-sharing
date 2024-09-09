@@ -12,6 +12,7 @@ struct Zone_SharingApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(ViewModelTwo())
         }
     }
 }
