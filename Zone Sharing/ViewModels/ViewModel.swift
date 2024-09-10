@@ -147,7 +147,7 @@ final class ViewModel: ObservableObject {
     
     //MARK: - Author/Username
     
-    private func fetchUserName() async {
+        func fetchUserName() async {
         do {
             let userIdentity = try await container.userIdentity(forUserRecordID: try await container.userRecordID())
             if let name = userIdentity?.nameComponents?.givenName ?? userIdentity?.nameComponents?.familyName {

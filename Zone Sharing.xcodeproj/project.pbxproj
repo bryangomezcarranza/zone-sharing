@@ -32,6 +32,7 @@
 		88CC729F2C8F971E00D82A0A /* CloudSharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSharingView.swift; sourceTree = "<group>"; };
 		88CC72A12C8F988A00D82A0A /* AddPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPostView.swift; sourceTree = "<group>"; };
 		88CC72A42C8FBE0400D82A0A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		88CC72A62C8FC0B300D82A0A /* Zone-Sharing-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "Zone-Sharing-Info.plist"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,12 +65,13 @@
 		88CC72822C8B794800D82A0A /* Zone Sharing */ = {
 			isa = PBXGroup;
 			children = (
+				88CC72A62C8FC0B300D82A0A /* Zone-Sharing-Info.plist */,
 				88CC729E2C8F970A00D82A0A /* Views */,
 				88CC72972C8B809200D82A0A /* ViewModels */,
 				88CC72962C8B805800D82A0A /* Models */,
 				88CC72A32C8FBD2500D82A0A /* App */,
+				88CC72912C8B7C8100D82A0A /* Zone Sharing.entitlements */,
 				88CC72892C8B794A00D82A0A /* Preview Content */,
-				88CC729A2C8B818E00D82A0A /* Config.swift */,
 			);
 			path = "Zone Sharing";
 			sourceTree = "<group>";
@@ -111,9 +113,9 @@
 		88CC72A32C8FBD2500D82A0A /* App */ = {
 			isa = PBXGroup;
 			children = (
-				88CC72912C8B7C8100D82A0A /* Zone Sharing.entitlements */,
 				88CC72872C8B794A00D82A0A /* Assets.xcassets */,
 				88CC72832C8B794800D82A0A /* AppDelegate.swift */,
+				88CC729A2C8B818E00D82A0A /* Config.swift */,
 				88CC72A42C8FBE0400D82A0A /* SceneDelegate.swift */,
 			);
 			path = App;
@@ -334,9 +336,10 @@
 				DEVELOPMENT_TEAM = D5YK8XAHMK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_FILE = "Zone-Sharing-Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -364,9 +367,10 @@
 				DEVELOPMENT_TEAM = D5YK8XAHMK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_FILE = "Zone-Sharing-Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (

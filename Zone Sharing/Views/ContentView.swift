@@ -26,7 +26,7 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             contentView
-                .navigationTitle("Contacts")
+                .navigationTitle("Posts")
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button { Task { try await vm.refresh() } } label: { Image(systemName: "arrow.clockwise") }
@@ -42,11 +42,15 @@ struct ContentView: View {
         .navigationViewStyle(.stack)
         .onAppear {
             Task {
+                try await vm.fetchUserName()
                 try await vm.refresh()
             }
         }
         .sheet(isPresented: $isAddingContact, content: {
            AddPostView(onAdd: addContact, onCancel: { isAddingContact = false })
+        })
+        .sheet(isPresented: $isSharing, content: {
+            shareView()
         })
     }
 
@@ -75,11 +79,20 @@ struct ContentView: View {
             switch vm.state {
             case let .loaded(privateContacts, sharedContacts):
                 List {
-                    Section(header: Text("My Contacts")) {
-                        ForEach(privateContacts) { contactRowView(for: $0) }
+                    Section {
+                        ForEach(privateContacts) { contactRowView(for: $0, isShared: false) }
+                    } header: {
+                        Text("My Posts")
+                    } footer: {
+                        Button("Share Posts") { Task { try? await shareContact()}}
                     }
-                    Section(header: Text("Shared")) {
-                        ForEach(sharedContacts) { contactRowView(for: $0) }
+                    
+                    if !sharedContacts.isEmpty {
+                        Section {
+                            ForEach(sharedContacts) { contactRowView(for: $0, isShared: true) }
+                        } header: {
+                            Text("Shared")
+                        }
                     }
                 }.listStyle(GroupedListStyle())
 
@@ -105,10 +118,20 @@ struct ContentView: View {
     }
 
     /// Builds a Contact row view for display contact information in a List.
-    private func contactRowView(for post: Post) -> some View {
+    private func contactRowView(for post: Post, isShared: Bool) -> some View {
         HStack {
             VStack(alignment: .leading) {
                 Text(post.message)
+                
+                if isShared {
+                    Text("by \(post.author)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("by \(post.author)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
     }
@@ -121,7 +144,7 @@ struct ContentView: View {
         isAddingContact = false
     }
 
-    private func shareContact(_ post: Post) async throws {
+    private func shareContact() async throws {
         isProcessingShare = true
 
         do {
